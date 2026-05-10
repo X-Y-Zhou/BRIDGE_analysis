@@ -75,9 +75,9 @@ ps = Flux.params(params);
 
 # Read inference counts data
 # True value is [σ_on,σ_off,ρ,d] =  [0.595,7.335,37.865,0.474]. You can replace it with your own data.
-counts = readdlm("dataset/synthetic_data/counts_example.txt")
-N_sample = Int.(counts[:,1])
-M_sample = Int.(counts[:,2])
+SSA_counts = readdlm("dataset/synthetic_data/counts_example.txt")
+N_sample = Int.(SSA_counts[:,1])
+M_sample = Int.(SSA_counts[:,2])
 Sample_size = length(N_sample)
 
 # Convert counts data to joint distribution
