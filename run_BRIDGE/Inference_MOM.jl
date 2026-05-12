@@ -39,7 +39,7 @@ function objective_function(ps,SSA_counts)
     return mse
 end
 
-SSA_counts = readdlm("dataset/synthetic_data/counts_example.txt")
+SSA_counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
 init = [1,1,1,1]
 init_ps = log.(init)
 itera = 1000

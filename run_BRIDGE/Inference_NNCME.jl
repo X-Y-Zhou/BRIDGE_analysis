@@ -19,7 +19,7 @@ NS = Nn * Nm
 TOT = 2 * NS
 τ = 1.0
 
-counts = readdlm("dataset/synthetic_data/counts_example.txt")
+counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
 N_sample = Int.(counts[:,1])
 M_sample = Int.(counts[:,2])
 Sample_size = length(N_sample)

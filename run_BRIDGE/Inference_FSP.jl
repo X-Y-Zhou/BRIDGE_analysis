@@ -107,7 +107,7 @@ function int_dist(ps, hist_data)
     return -sum(hist_data.*log.(output.+1e-12))
 end
 
-counts = readdlm("dataset/synthetic_data/counts_example.txt")
+counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
 N_sample = Int.(counts[:,1])
 M_sample = Int.(counts[:,2])
 Sample_size = length(N_sample)

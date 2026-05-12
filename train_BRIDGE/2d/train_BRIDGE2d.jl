@@ -1,3 +1,4 @@
+# Load packages
 using Plots,Random,Distributions,Flux,DelimitedFiles,FastGaussQuadrature
 using Flux,DelimitedFiles,Plots
 using DataFrames,CSV
@@ -16,19 +17,17 @@ N = length(z1)
 
 # Define Gaussian Quadrature points and corresponding weights
 n = N
-a = 0
-b = 1
+
+a,b = [0,1]
 interval_X, weights = gausslegendre(n)
 x1 = ((b - a) .* interval_X .+ b .+ a) ./ 2
 w1 = weights * (b - a) / 2
 
-a = 0
-b = 1
+a,b = [0,1]
 interval_X, weights = gausslegendre(n)
 x2 = ((b - a) .* interval_X .+ b .+ a) ./ 2
 w2 = weights * (b - a) / 2
 
-X = [(x1[i],x2[j]) for i = 1 :length(x1) for j = 1:length(x2)]
 W = vec(w1*w2')
 W_mat = repeat(reshape(W, :, 1), 1, batchsize)
 
@@ -82,24 +81,4 @@ end
 using CSV,DataFrames
 df = DataFrame(params = params)
 CSV.write("train_BRIDGE/2d/params_trained.txt",df)
-
-
-t = Template(;
-    user = "X-Y-Zhou",
-    authors = ["X-Y-Zhou"],
-    dir = "/Users/x-y-zhou/Documents/GitHub",
-    julia = v"1.8",
-    plugins = [
-        License(; name = "MIT"),
-        Git(; manifest = true),
-        GitHubActions(),
-        Documenter{GitHubActions}(),
-        Readme(),
-        Tests(),
-    ],
-)
-
-t("BRIDGE")
-
-
 

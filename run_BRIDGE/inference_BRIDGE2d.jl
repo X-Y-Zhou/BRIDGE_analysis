@@ -1,3 +1,4 @@
+# Import packages
 using Optim, Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random
 using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions
 include("utils.jl")
@@ -13,7 +14,7 @@ function G_tele_delay(σon,σoff,ρ,τ,z)
     return real(G1)
 end
 
-# Compute Full model PGF with BRIDGE
+# Define the function to compute Full model PGF with BRIDGE
 function forward(x,λ,p)
     x = vcat(x, λ)
     output = re(p)(x)
@@ -33,7 +34,8 @@ function get_MLP_gf(ps)
     return vec(output)
 end
 
-# Objective function
+
+# Define objective function
 function int_dist(ps, SSA_PGF, a, W)
     dist = get_MLP_gf(ps).^(1+a) .- get_MLP_gf(ps).^a .* SSA_PGF .* (1+1/a) .+ SSA_PGF / a
     return sum(W .* dist)
@@ -62,7 +64,7 @@ z2 = x2
 # Define hidden channels
 hidden_channels = 40
 
-# Initialize BRIGE Model
+# Initialize BRIGE model
 model = Chain(Dense(length(z1)+1, hidden_channels,tanh),Dense(hidden_channels, length(z1)*length(z2)),x -> softplus.(x))
 params, re = Flux.destructure(model);
 ps = Flux.params(params);
@@ -108,4 +110,4 @@ inferred_params = exp.(results)
 # Check inferred Parameters
 inferred_PGF = get_MLP_gf(inferred_params)
 scatter(SSA_PGF,inferred_PGF)
-plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)])
+plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)],lw=2)

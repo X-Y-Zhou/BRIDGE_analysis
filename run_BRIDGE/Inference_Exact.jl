@@ -52,7 +52,7 @@ z2 = x2
 Z1 = repeat(z1, 1, length(z2))
 Z2 = repeat(z2', length(z1), 1)
 
-counts = readdlm("dataset/synthetic_data/counts_example.txt")
+counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
 N_sample = Int.(counts[:,1])
 M_sample = Int.(counts[:,2])
 Sample_size = length(N_sample)

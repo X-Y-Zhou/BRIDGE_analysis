@@ -46,7 +46,7 @@ function bayesdist(params, constant, SSA_counts)
     ApproxBayes.ksdist(simdata, SSA_counts), 1
 end
 
-counts = readdlm("dataset/synthetic_data/counts_example.txt")
+counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
 N_sample = Int.(counts[:,1])
 M_sample = Int.(counts[:,2])
 SSA_counts = [N_sample;M_sample]
