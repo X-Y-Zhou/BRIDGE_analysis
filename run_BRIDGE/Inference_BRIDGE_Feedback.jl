@@ -1,6 +1,6 @@
 # Import packages
 using Optim, Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random
-using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions
+using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions,NLsolve
 include("../utils.jl")
 
 # Define Reduced model PGF
@@ -12,6 +12,15 @@ function G_tele_delay(σon,σoff,ρ,τ,z)
     uf = (r-θ-1)/2
     G1 = (uz*exp(-uf*τ)-uf*exp(-uz*τ))/θ + ρ*u1*σon*(exp(-uf*τ)-exp(-uz*τ))/(θ*(σoff+σon))
     return real(G1)
+end
+
+# Convert parameters with LMA
+function convert_LMA_feedback(ps)
+    σ_on,σ_off,ρ,d,λ,dp = ps
+    g = σ_on / (σ_off + σ_on)
+    mg = λ * ρ * σ_on * (d * dp + d * σ_on + dp * σ_on + σ_off * σ_on + σ_on^2) / (d * dp * (σ_off + σ_on) * (d + σ_off + σ_on) * (dp + σ_off + σ_on))
+    σ_off = σ_off*g/mg
+    return σ_off
 end
 
 # Define the function to compute Full model PGF with BRIDGE
@@ -81,8 +90,8 @@ params = df.params
 ps = Flux.params(params);
 
 # Read inference counts data
-# True value is [σ_on,σ_off,ρ,d,λ,dp] =  [1.773,0.410,1.528,0.973,4.529,1.241]. You can replace it with your own data.
-SSA_counts = readdlm("dataset/synthetic_data/counts_example3d.txt")
+# True value is [σ_on,σ_off,ρ,d,λ,dp] =  [2.236,0.0252,3.557,0.543,4.452,0.257]. You can replace it with your own data.
+SSA_counts = readdlm("dataset/synthetic_data/counts_example_feedback.txt")
 N_sample = Int.(SSA_counts[:,1])
 M_sample = Int.(SSA_counts[:,2])
 P_sample = Int.(SSA_counts[:,3])
@@ -113,11 +122,17 @@ results, time, _,_ = @timed Optim.optimize(ps->int_dist(exp.(ps),SSA_PGF,1.0,W),
 Optim.Options(show_trace=true,g_tol=1e-20,iterations = itera)).minimizer
 
 # Obtain inferred parameters
-inferred_params = exp.(results)
+inferred_params_equal = exp.(results)
+
+# Convert full model parameters to feedback model parameters
+inferred_params = [inferred_params_equal[1];convert_LMA_feedback(inferred_params_equal);inferred_params_equal[3:end]]
 
 # Check inferred parameters
-inferred_PGF = get_MLP_gf(inferred_params)
+inferred_PGF = get_MLP_gf(inferred_params_equal)
 Flux.mse(inferred_PGF,SSA_PGF)
 
 scatter(SSA_PGF,inferred_PGF,xlabel="SSA",ylabel="inferred");
 plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)],lw=2)
+
+
+

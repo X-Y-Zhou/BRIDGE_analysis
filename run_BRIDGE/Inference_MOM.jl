@@ -2,7 +2,7 @@
 
 using Optim, CSV, DataFrames,LinearAlgebra, Distributions, SparseArrays
 using Statistics,DelimitedFiles,StatsBase,Distributed
-include("utils.jl")
+include("../utils.jl")
 
 function observed_moments(N_sample,M_sample)
     mean_N = mean(N_sample)

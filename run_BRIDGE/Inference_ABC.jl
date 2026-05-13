@@ -4,7 +4,7 @@ using Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random
 using Flux,DataFrames,CSV
 using Catalyst.EnsembleAnalysis,Statistics
 using DelaySSAToolkit,Catalyst,ApproxBayes
-include("utils.jl")
+include("../utils.jl")
 
 rn = @reaction_network begin
     σon,  Goff --> Gon

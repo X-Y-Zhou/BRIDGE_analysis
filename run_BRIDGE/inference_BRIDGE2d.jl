@@ -1,7 +1,7 @@
 # Import packages
 using Optim, Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random
 using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions
-include("utils.jl")
+include("../utils.jl")
 
 # Define Reduced model PGF
 function G_tele_delay(σon,σoff,ρ,τ,z)
@@ -109,5 +109,5 @@ inferred_params = exp.(results)
 
 # Check inferred Parameters
 inferred_PGF = get_MLP_gf(inferred_params)
-scatter(SSA_PGF,inferred_PGF)
+scatter(SSA_PGF,inferred_PGF,xlabel="SSA",ylabel="inferred")
 plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)],lw=2)

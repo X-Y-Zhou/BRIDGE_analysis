@@ -15,7 +15,7 @@ function convert_histo(data::Vector)
     return saved[:,1], saved[:,2]
 end
 
-# embeding the distribution to length N 
+# Embeding the distribution to length N 
 function embeding_dist(dist,N)
     if length(dist)<N
         dist = vcat(dist,zeros(N-length(dist)))
@@ -34,49 +34,20 @@ P2var(P) = ([P[i] * (i-1)^2 for i in 1:length(P)] |> sum) - P2mean(P)^2
 # Calculate second moment sm
 P2sm(P) = [P[i] * (i-1)^2 for i in 1:length(P)] |> sum
 
-# normalization
+# Normalization
 function set_one(vec)
     vec = abs.(vec)
     vec = vec./sum(vec)
     return vec
 end
 
-function restore_nested_array(filename)
-    lines = readlines(filename)
-    
-    nested_array = []
-    current_matrix = []
-    
-    for line in lines
-        if isempty(line)
-            continue
-        end
-
-        if startswith(line, "Matrix")
-            if !isempty(current_matrix)
-                push!(nested_array, vcat(current_matrix...))
-                current_matrix = []
-            end
-        else
-            row = parse.(Float64, split(line, ","))
-            push!(current_matrix, row')
-        end
-    end
-    
-    if !isempty(current_matrix)
-        push!(nested_array, vcat(current_matrix...))
-    end
-    
-    return nested_array
-end
-
+# Convert distribution to PGF for 1d 2d and 3d
 function hist_gf1d(hist_data,z)
     N = length(hist_data)
     z_vec = [z.^i for i = 0:N-1]
     return sum(z_vec.*hist_data)
 end
 
-# row z1, column z2
 function hist_gf2d(hist_data,z1,z2)
     Nx = size(hist_data,1)
     Ny = size(hist_data,2)

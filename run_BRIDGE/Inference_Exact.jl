@@ -2,7 +2,7 @@
 
 using Optim, Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random
 using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions
-include("utils.jl")
+include("../utils.jl")
 
 function Gz1z2(σon,σoff,ρ,τ,dm,z1,z2)
     τ=1

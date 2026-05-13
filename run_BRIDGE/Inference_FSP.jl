@@ -3,7 +3,7 @@
 using DelimitedFiles,Optim,Flux
 using SparseArrays, StatsBase, LinearAlgebra
 using Distributions, SparseArrays,DifferentialEquations
-include("utils.jl")
+include("../utils.jl")
 
 function CME_aux!(du,u,p,t)
     ρ,σon,σoff,N=p
