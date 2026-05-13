@@ -40,7 +40,7 @@ z3 = x3
 Ny = 7
 xl, wl = gausslegendre(Ny)
 
-data = readdlm("dataset/synthetic_data/βλforinfercv_1e4.txt")
+data = readdlm("dataset/synthetic_data/β1β2.txt")
 β1 = data[:, 1]
 β2 = data[:, 2]
 Density_joint = kde((β1, β2))
@@ -125,9 +125,8 @@ params = df.params
 ps = Flux.params(params);
 
 # Read inference counts data
-# True value is [σ_on,σ_off,ρ,d,λ,dp] =  [1.773,0.410,1.528,0.973,4.529,1.241]. You can replace it with your own data.
-set = 1832
-SSA_counts = readdlm("dataset/synthetic_data/capture_rate/counts_example_capture_rate$(set).txt")
+# True value is [σ_on,σ_off,ρ,d,λ,dp] =  [1.011,0.838,3.135,0.208,1.968,1.542]. You can replace it with your own data.
+SSA_counts = readdlm("dataset/synthetic_data/counts_example_capture_rate.txt")
 N_sample = Int.(SSA_counts[:,1])
 M_sample = Int.(SSA_counts[:,2])
 P_sample = Int.(SSA_counts[:,3])
@@ -160,10 +159,6 @@ Optim.Options(show_trace=true,g_tol=1e-20,iterations = itera)).minimizer
 # Obtain inferred parameters
 inferred_params = exp.(results)
 
-ps_true_matrix = readdlm("/Users/x-y-zhou/Documents/GitHub/Cell-FNO/trailrange/Fig5/inference_CV/psforinfercv.txt")
-[ps_true_matrix[set,:] inferred_params]
-mean(abs.(inferred_params.-ps)./ps)
-
 # Check inferred parameters
 inferred_PGF = get_MLP_gf(inferred_params)
 Flux.mse(inferred_PGF,SSA_PGF)
@@ -171,51 +166,3 @@ Flux.mse(inferred_PGF,SSA_PGF)
 scatter(SSA_PGF,inferred_PGF,xlabel="SSA",ylabel="inferred");
 plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)],lw=2)
 
-re_list = []
-ps_inferred_list = []
-set_list = Int.(vec(readdlm("/Users/x-y-zhou/Documents/GitHub/Cell-FNO/trailrange/Fig5/inference_CV/inference_results/re_good3.txt")))
-
-for set in set_list
-    print(set,"\n")
-    SSA_counts = readdlm("dataset/synthetic_data/capture_rate/counts_example_capture_rate$(set).txt")
-    N_sample = Int.(SSA_counts[:,1])
-    M_sample = Int.(SSA_counts[:,2])
-    P_sample = Int.(SSA_counts[:,3])
-    Sample_size = length(N_sample)
-
-    # Convert counts data to joint distribution
-    NMP_sample = [[N_sample[i],M_sample[i],P_sample[i]] for i=1:Sample_size]
-
-    N_max = maximum([n for (n, m, p) in NMP_sample])
-    M_max = maximum([m for (n, m, p) in NMP_sample])
-    P_max = maximum([p for (n, m, p) in NMP_sample])
-
-    joint_prob_matrix = zeros(Float64, N_max+1, M_max+1, P_max+1)
-
-    for (n, m, p) in NMP_sample
-        joint_prob_matrix[n+1, m+1, p+1] += 1
-    end
-    joint_prob_matrix /= length(NMP_sample)
-
-    # Convert joint distribution to PGF
-    SSA_PGF = vec(hist_gf3d(joint_prob_matrix,z1,z2,z3))
-
-    # Infer parameters
-    init = [1,1,1,1,1,1]
-    init_ps = log.(init)
-    itera = 1000
-    results, time, _,_ = @timed Optim.optimize(ps->int_dist(exp.(ps),SSA_PGF,1.0,W),init_ps,
-    Optim.Options(show_trace=false,g_tol=1e-20,iterations = itera)).minimizer
-
-    # Obtain inferred parameters
-    inferred_params = exp.(results)
-
-    ps_true_matrix = readdlm("/Users/x-y-zhou/Documents/GitHub/Cell-FNO/trailrange/Fig5/inference_CV/psforinfercv.txt")
-    ps_true = ps_true_matrix[set,:]
-    push!(re_list,mean(abs.(inferred_params.-ps_true)./ps_true))
-    push!(ps_inferred_list,inferred_params)
-end
-
-re_list[29]
-ps_inferred_list
-set_list[29]
