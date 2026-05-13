@@ -9,7 +9,8 @@ Multinomial single-cell sequencing data are often integrated with feature-concat
 
 ## Tutorials
 The BRIDGE's neural network structure, pretraining protocol and inference protocol can be described as
-![illustrate](illustrate.png)
+![illustrate](https://github.com/X-Y-Zhou/BRIDGE_analysis/blob/main/illustrate.png)
+
 A quick demo for applying BRIDGE to a delayed transcription-splicing model is in [example](Tutorials.ipynb).
 
 
