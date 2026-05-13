@@ -20,21 +20,21 @@ TOT = 2 * NS
 τ = 1.0
 
 counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
-N_sample = Int.(counts[:,1])
-M_sample = Int.(counts[:,2])
-Sample_size = length(N_sample)
+U_sample = Int.(counts[:,1])
+S_sample = Int.(counts[:,2])
+Sample_size = length(U_sample)
 
 # Convert counts data to joint distribution
-NM_sample = [[N_sample[i],M_sample[i]] for i=1:Sample_size]
-N_max = Int(maximum([n for (n, m) in NM_sample]))
-M_max = Int(maximum([m for (n, m) in NM_sample]))
+US_sample = [[U_sample[i],S_sample[i]] for i=1:Sample_size]
+U_max = Int(maximum([n for (n, m) in US_sample]))
+S_max = Int(maximum([m for (n, m) in US_sample]))
 
-joint_prob_matrix = zeros(Float64, N_max+1, M_max+1)
-for (m, n) in NM_sample
+joint_prob_matrix = zeros(Float64, U_max+1, S_max+1)
+for (m, n) in US_sample
     joint_prob_matrix[m+1, n+1] += 1
 end
 
-joint_prob_matrix /= length(NM_sample)
+joint_prob_matrix /= length(US_sample)
 P_data = resize_matrix(joint_prob_matrix,Nn,Nm)
 P_data ./= sum(P_data)
 

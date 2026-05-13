@@ -52,21 +52,21 @@ z2 = x2
 Z1 = repeat(z1, 1, length(z2))
 Z2 = repeat(z2', length(z1), 1)
 
-counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
-N_sample = Int.(counts[:,1])
-M_sample = Int.(counts[:,2])
-Sample_size = length(N_sample)
+SSA_counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
+U_sample = Int.(SSA_counts[:,1])
+S_sample = Int.(SSA_counts[:,2])
+Sample_size = length(U_sample)
 
-NM_sample = [[N_sample[i],M_sample[i]] for i=1:Sample_size]
-N_max = Int(maximum([n for (n, m) in NM_sample]))
-M_max = Int(maximum([m for (n, m) in NM_sample]))
+US_sample = [[U_sample[i],S_sample[i]] for i=1:Sample_size]
+U_max = Int(maximum([n for (n, m) in US_sample]))
+S_max = Int(maximum([m for (n, m) in US_sample]))
 
-joint_prob_matrix = zeros(Float64, N_max+1, M_max+1)
-for (m, n) in NM_sample
+joint_prob_matrix = zeros(Float64, U_max+1, S_max+1)
+for (m, n) in US_sample
     joint_prob_matrix[m+1, n+1] += 1
 end
 
-joint_prob_matrix /= length(NM_sample)
+joint_prob_matrix /= length(US_sample)
 SSA_PGF = vec(hist_gf2d(joint_prob_matrix,z1,z2))
 
 init = [1,1,1,1]
@@ -76,10 +76,4 @@ results, time, _,_ = @timed Optim.optimize(ps->int_dist(exp.(ps),SSA_PGF,1.0,W),
                                             Optim.Options(show_trace=true,g_tol=1e-11,iterations = itera)).minimizer
 
 infer_params = exp.(results)
-
-# Check inferred Parameters
-inferred_PGF = get_exact_gf(infer_params)
-scatter(SSA_PGF,inferred_PGF)
-plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)])
-
 

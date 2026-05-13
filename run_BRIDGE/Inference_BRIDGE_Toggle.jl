@@ -19,18 +19,18 @@ end
 # Convert counts to distribution
 function convert_counts_to_PGF3d(U_counts,S_counts,P_counts)
     Sample_size = length(U_counts)
-    NMP_sample = [[U_counts[i],S_counts[i],P_counts[i]] for i=1:Sample_size]
+    USP_sample = [[U_counts[i],S_counts[i],P_counts[i]] for i=1:Sample_size]
 
-    N_max = maximum([n for (n, m, p) in NMP_sample])
-    M_max = maximum([m for (n, m, p) in NMP_sample])
-    P_max = maximum([p for (n, m, p) in NMP_sample])
+    U_max = maximum([n for (n, m, p) in USP_sample])
+    S_max = maximum([m for (n, m, p) in USP_sample])
+    P_max = maximum([p for (n, m, p) in USP_sample])
     
-    joint_prob_matrix = zeros(Float64, N_max+1, M_max+1, P_max+1)
+    joint_prob_matrix = zeros(Float64, U_max+1, S_max+1, P_max+1)
     
-    for (n, m, p) in NMP_sample
+    for (n, m, p) in USP_sample
         joint_prob_matrix[n+1, m+1, p+1] += 1
     end
-    joint_prob_matrix /= length(NMP_sample)
+    joint_prob_matrix /= length(USP_sample)
     
     SSA_PGF = vec(hist_gf3d(joint_prob_matrix,z1,z2,z3))
     return SSA_PGF
@@ -68,16 +68,16 @@ ps = Flux.params(params);
 # [σ_on1,σ_off1,ρ1,d1,λ1,dp1] = [2.139, 0.108, 1.818, 0.929, 0.566, 1.994]
 # [σ_on2,σ_off2,ρ2,d2,λ2,dp2] = [1.523, 0.702, 1.849, 0.941, 3.842, 1.910]
 SSA_counts = readdlm("dataset/synthetic_data/counts_example_toggle.txt")
-N1_sample = Int.(SSA_counts[:,1])
-M1_sample = Int.(SSA_counts[:,2])
+U1_sample = Int.(SSA_counts[:,1])
+S1_sample = Int.(SSA_counts[:,2])
 P1_sample = Int.(SSA_counts[:,3])
 
-N2_sample = Int.(SSA_counts[:,4])
-M2_sample = Int.(SSA_counts[:,5])
+U2_sample = Int.(SSA_counts[:,4])
+S2_sample = Int.(SSA_counts[:,5])
 P2_sample = Int.(SSA_counts[:,6])
 
-SSA_PGF1 = convert_counts_to_PGF3d(N1_sample,M1_sample,P1_sample)
-SSA_PGF2 = convert_counts_to_PGF3d(N2_sample,M2_sample,P2_sample)
+SSA_PGF1 = convert_counts_to_PGF3d(U1_sample,S1_sample,P1_sample)
+SSA_PGF2 = convert_counts_to_PGF3d(U2_sample,S2_sample,P2_sample)
 
 # Infer parameters
 init = [1,1,1,1,1,1]

@@ -32,21 +32,21 @@ ps = Flux.params(params);
 # Read inference counts data
 # True value is [σ_on,σ_off,ρ,d] =  [0.595,7.335,37.865,0.474]. You can replace it with your own data.
 SSA_counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
-N_sample = Int.(SSA_counts[:,1])
-M_sample = Int.(SSA_counts[:,2])
-Sample_size = length(N_sample)
+U_sample = Int.(SSA_counts[:,1])
+S_sample = Int.(SSA_counts[:,2])
+Sample_size = length(U_sample)
 
 # Convert counts data to joint distribution
-NM_sample = [[N_sample[i],M_sample[i]] for i=1:Sample_size]
-N_max = Int(maximum([n for (n, m) in NM_sample]))
-M_max = Int(maximum([m for (n, m) in NM_sample]))
+US_sample = [[U_sample[i],S_sample[i]] for i=1:Sample_size]
+U_max = Int(maximum([n for (n, m) in US_sample]))
+S_max = Int(maximum([m for (n, m) in US_sample]))
 
-joint_prob_matrix = zeros(Float64, N_max+1, M_max+1)
-for (m, n) in NM_sample
+joint_prob_matrix = zeros(Float64, U_max+1, S_max+1)
+for (m, n) in US_sample
     joint_prob_matrix[m+1, n+1] += 1
 end
 
-joint_prob_matrix /= length(NM_sample)
+joint_prob_matrix /= length(US_sample)
 
 # Convert joint distribution to PGF
 SSA_PGF = vec(hist_gf2d(joint_prob_matrix,z1,z2)')

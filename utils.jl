@@ -36,18 +36,18 @@ end
 # Convert 3d counts to PGF
 function convert_counts_to_PGF3d(U_counts,S_counts,P_counts)
     Sample_size = length(U_counts)
-    NMP_sample = [[U_counts[i],S_counts[i],P_counts[i]] for i=1:Sample_size]
+    USP_sample = [[U_counts[i],S_counts[i],P_counts[i]] for i=1:Sample_size]
 
-    N_max = maximum([n for (n, m, p) in NMP_sample])
-    M_max = maximum([m for (n, m, p) in NMP_sample])
-    P_max = maximum([p for (n, m, p) in NMP_sample])
+    U_max = maximum([n for (n, m, p) in USP_sample])
+    S_max = maximum([m for (n, m, p) in USP_sample])
+    P_max = maximum([p for (n, m, p) in USP_sample])
     
-    joint_prob_matrix = zeros(Float64, N_max+1, M_max+1, P_max+1)
+    joint_prob_matrix = zeros(Float64, U_max+1, S_max+1, P_max+1)
     
-    for (n, m, p) in NMP_sample
+    for (n, m, p) in USP_sample
         joint_prob_matrix[n+1, m+1, p+1] += 1
     end
-    joint_prob_matrix /= length(NMP_sample)
+    joint_prob_matrix /= length(USP_sample)
     
     SSA_PGF = vec(hist_gf3d(joint_prob_matrix,z1,z2,z3))
     return SSA_PGF

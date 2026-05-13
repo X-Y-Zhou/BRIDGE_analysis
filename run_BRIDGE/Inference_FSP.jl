@@ -107,21 +107,21 @@ function int_dist(ps, hist_data)
     return -sum(hist_data.*log.(output.+1e-12))
 end
 
-counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
-N_sample = Int.(counts[:,1])
-M_sample = Int.(counts[:,2])
-Sample_size = length(N_sample)
+SSA_counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
+U_sample = Int.(SSA_counts[:,1])
+S_sample = Int.(SSA_counts[:,2])
+Sample_size = length(U_sample)
 
-NM_sample = [[N_sample[i],M_sample[i]] for i=1:Sample_size]
-N_max = Int(maximum([n for (n, m) in NM_sample]))
-M_max = Int(maximum([m for (n, m) in NM_sample]))
+US_sample = [[U_sample[i],S_sample[i]] for i=1:Sample_size]
+U_max = Int(maximum([n for (n, m) in US_sample]))
+S_max = Int(maximum([m for (n, m) in US_sample]))
 
-joint_prob_matrix = zeros(Float64, N_max+1, M_max+1)
-for (m, n) in NM_sample
+joint_prob_matrix = zeros(Float64, U_max+1, S_max+1)
+for (m, n) in US_sample
     joint_prob_matrix[m+1, n+1] += 1
 end
 
-joint_prob_matrix /= length(NM_sample)
+joint_prob_matrix /= length(US_sample)
 hist_data = joint_prob_matrix
 
 init = [1,1,1,1]

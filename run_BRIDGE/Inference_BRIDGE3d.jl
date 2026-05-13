@@ -33,13 +33,13 @@ ps = Flux.params(params);
 # Read inference counts data
 # True value is [σ_on,σ_off,ρ,d,λ,dp] =  [1.773,0.410,1.528,0.973,4.529,1.241]. You can replace it with your own data.
 SSA_counts = readdlm("dataset/synthetic_data/counts_example3d.txt")
-N_sample = Int.(SSA_counts[:,1])
-M_sample = Int.(SSA_counts[:,2])
+U_sample = Int.(SSA_counts[:,1])
+S_sample = Int.(SSA_counts[:,2])
 P_sample = Int.(SSA_counts[:,3])
-Sample_size = length(N_sample)
+Sample_size = length(U_sample)
 
 # Convert counts to PGF
-SSA_PGF = convert_counts_to_PGF3d(N_sample,M_sample,P_sample)
+SSA_PGF = convert_counts_to_PGF3d(U_sample,S_sample,P_sample)
 
 # Infer parameters
 init = [1,1,1,1,1,1]

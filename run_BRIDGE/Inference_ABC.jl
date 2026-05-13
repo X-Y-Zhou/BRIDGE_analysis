@@ -9,8 +9,8 @@ include("../utils.jl")
 rn = @reaction_network begin
     σon,  Goff --> Gon
     σoff, Gon  --> Goff
-    ρ, Gon --> Gon + N
-    dm, M --> 0
+    ρ, Gon --> Gon + U
+    dm, S --> 0
 end σon σoff ρ dm
 
 jumpsys = convert(JumpSystem, rn; combinatoric_ratelaws=false)
@@ -40,16 +40,16 @@ function bayesdist(params, constant, SSA_counts)
     interation = Int(1e4)
     ensprob = EnsembleProblem(djprob)
     ens = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=interation,saveat=1)
-    N_sample = componentwise_vectors_timepoint(ens, tf)[3]
-    M_sample = componentwise_vectors_timepoint(ens, tf)[4]
-    simdata = [N_sample;M_sample]
+    U_sample = componentwise_vectors_timepoint(ens, tf)[3]
+    S_sample = componentwise_vectors_timepoint(ens, tf)[4]
+    simdata = [U_sample;S_sample]
     ApproxBayes.ksdist(simdata, SSA_counts), 1
 end
 
 counts = readdlm("dataset/synthetic_data/counts_example2d.txt")
-N_sample = Int.(counts[:,1])
-M_sample = Int.(counts[:,2])
-SSA_counts = [N_sample;M_sample]
+U_sample = Int.(counts[:,1])
+S_sample = Int.(counts[:,2])
+SSA_counts = [U_sample;S_sample]
 ϵ = 0.2
 
 setup = ABCRejection(bayesdist, # simulation function

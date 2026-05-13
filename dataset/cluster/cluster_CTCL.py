@@ -1,10 +1,12 @@
+# Cell annotation forked from https://github.com/pachterlab/GSP_2019/blob/master/ECCITE%20CTCL.ipynb
+
 import numpy as np
 import matplotlib.pyplot as plt
 import velocyto as vcy
 import protaccel.protaccel as pa
 
-[prot_count_array,prot_cells,adt_names] = pa.import_prot_data('dataset/real_data/GSM3596096_ctrl-ADT-count.csv')
-vlm = vcy.VelocytoLoom("dataset/real_data/190426_ctrl.loom")
+[prot_count_array,prot_cells,adt_names] = pa.import_prot_data('dataset/real_data/GSM3596101_CTCL-ADT-count.csv')
+vlm = vcy.VelocytoLoom("dataset/real_data/190426_CTCL.loom")
 
 vlm.score_cv_vs_mean(3000, plot=True, max_expr_avg=100, min_expr_cells=20)
 vlm.score_detection_levels(min_expr_counts=40, min_cells_express=30)
@@ -15,15 +17,17 @@ InvertDict = lambda d: dict( (v,k) for k in d for v in d[k] )
 prot_dict = InvertDict(gene_dict)
 mrna_targets = list(prot_dict.keys())
 pa.enforce_protein_filter(vlm,mrna_targets,adt_names)
+
 vlm.filter_genes(by_cv_vs_mean=True,by_detection_levels=True)
 
 first_char = vlm.ca['CellID'][0].find(':')+1
 last_char = -1
 
 [prot_count_array, shared_cells, prot_cells] = pa.shared_cells_filter(vlm, prot_cells, prot_count_array, first_char, last_char)
+
 pa.impute(vlm, prot_count_array, k=800, impute_in_prot_space=True, size_norm=False, impute_in_pca_space=False)
 
-t_cl =  [3,0,3,1,2,0,0]
+t_cl =  [0,0,1,2,1]
 [cluster_ID, num_clusters] = pa.identify_clusters(vlm,vlm.connectivity,
                                                   correct_tags=True,tag_correction_list=t_cl,
-                                                  method_name='RBERVertexPartition')
+                                                  method_name='ModularityVertexPartition')
