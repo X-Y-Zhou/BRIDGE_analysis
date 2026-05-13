@@ -13,11 +13,9 @@ dm_list = ps_true_matrix[:,4]
 batchsize = length(σon_list)
 
 # Define number of Gaussian Quadrature points 
-N = length(z1)
+n = length(z1)
 
 # Define Gaussian Quadrature points and corresponding weights
-n = N
-
 a,b = [0,1]
 interval_X, weights = gausslegendre(n)
 x1 = ((b - a) .* interval_X .+ b .+ a) ./ 2

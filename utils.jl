@@ -1,6 +1,58 @@
 using StatsBase,Distributions,DelimitedFiles
 using CSV,DataFrames
 
+# Define Reduced model PGF
+function G_tele_delay(σon,σoff,ρ,τ,z)
+    u1 = z-1
+    r = 1-ρ*u1+σoff+σon
+    θ = sqrt(Complex((ρ*u1-σoff-σon)^2+4*ρ*σon*u1))
+    uz = (r+θ-1)/2
+    uf = (r-θ-1)/2
+    G1 = (uz*exp(-uf*τ)-uf*exp(-uz*τ))/θ + ρ*u1*σon*(exp(-uf*τ)-exp(-uz*τ))/(θ*(σoff+σon))
+    return real(G1)
+end
+
+# Define the function to compute Full model PGF with BRIDGE
+function BRIGE_forward(input,ϕf_r,p,re)
+    input = vcat(input,ϕf_r)
+    output = re(p)(input)
+    return output
+end
+
+function BRIDGE_compute_full(ps,params,re)
+    σon,σoff,ρ = ps[1:3]
+    ϕf_r = ps[4:end]
+    input = G_tele_delay.(σon,σoff,ρ,1,z1)
+    output = BRIGE_forward(input,ϕf_r,params,re)
+    return vec(output)
+end
+
+# Define objective function
+function int_dist(ps, SSA_PGF, a, W, params, re)
+    dist = BRIDGE_compute_full(ps,params,re).^(1+a) .- BRIDGE_compute_full(ps,params,re).^a .* SSA_PGF .* (1+1/a) .+ SSA_PGF / a
+    return sum(W .* dist)
+end
+
+# Convert 3d counts to PGF
+function convert_counts_to_PGF3d(U_counts,S_counts,P_counts)
+    Sample_size = length(U_counts)
+    NMP_sample = [[U_counts[i],S_counts[i],P_counts[i]] for i=1:Sample_size]
+
+    N_max = maximum([n for (n, m, p) in NMP_sample])
+    M_max = maximum([m for (n, m, p) in NMP_sample])
+    P_max = maximum([p for (n, m, p) in NMP_sample])
+    
+    joint_prob_matrix = zeros(Float64, N_max+1, M_max+1, P_max+1)
+    
+    for (n, m, p) in NMP_sample
+        joint_prob_matrix[n+1, m+1, p+1] += 1
+    end
+    joint_prob_matrix /= length(NMP_sample)
+    
+    SSA_PGF = vec(hist_gf3d(joint_prob_matrix,z1,z2,z3))
+    return SSA_PGF
+end
+
 # Convert a vector to probability distributions
 function convert_histo(data::Vector)
     # Define histogram edge set (integers)
@@ -64,3 +116,6 @@ function hist_gf3d(hist_data,z1,z2,z3)
     return [sum([hist_data[i,j,k]*z1_value^(i-1)*z2_value^(j-1)*z3_value^(k-1) for i=1:Nx for j=1:Ny for k=1:Nz]) 
     for z1_value in z1, z2_value in z2, z3_value in z3] 
 end
+
+
+

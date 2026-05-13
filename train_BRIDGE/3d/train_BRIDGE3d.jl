@@ -15,11 +15,9 @@ dp_list = ps_true_matrix[:,6]
 batchsize = length(σon_list)
 
 # Define number of Gaussian Quadrature points 
-N = length(z1)
+n = length(z1)
 
 # Define Gaussian Quadrature points and corresponding weights
-n = N;
-
 a,b = [0,1]
 interval_X, weight = gausslegendre(n)
 x1 = ((b - a) .* interval_X .+ b .+ a) ./ 2
@@ -92,3 +90,5 @@ end
 using CSV,DataFrames
 df = DataFrame(params = params)
 CSV.write("train_BRIDGE/3d/params_trained.txt",df)
+
+
