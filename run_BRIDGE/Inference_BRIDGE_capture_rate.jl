@@ -1,3 +1,4 @@
+# Import packages
 using Optim, Statistics, Distributions, Plots,StatsBase,DelimitedFiles,Random,Interpolations
 using FastGaussQuadrature,Flux,DataFrames,CSV,HypergeometricFunctions,KernelDensity
 include("../utils.jl")
@@ -119,6 +120,6 @@ inferred_params = exp.(results)
 inferred_PGF = BRIDGE_compute_full_cp(inferred_params,params,re)
 Flux.mse(inferred_PGF,SSA_PGF)
 
-scatter(SSA_PGF,inferred_PGF,interval_Xabel="SSA",ylabel="inferred");
+scatter(SSA_PGF,inferred_PGF,xlabel="SSA",ylabel="inferred");
 plot!([minimum(SSA_PGF),maximum(SSA_PGF)],[minimum(SSA_PGF),maximum(SSA_PGF)],lw=2)
 
