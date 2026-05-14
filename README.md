@@ -60,8 +60,7 @@ A quick demo for applying BRIDGE to a delayed transcription-splicing model is in
 ## Corresponding package
 The package can be installed through the Julia package manager:
 ```julia
-using Pkg
-Pkg.add(https://github.com/X-Y-Zhou/BRIDGE.jl)
+] https://github.com/X-Y-Zhou/BRIDGE.jl
 using BRIDGE
 ```
 
